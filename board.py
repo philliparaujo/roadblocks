@@ -170,7 +170,33 @@ class Board:
                     row.append(" ")
                 new_board.append(row)
 
-            return new_board
+            return Board.Builder(new_board)
+
+        def fill_borders(self):
+            """ Fills outer walls with #?#?#? pattern and fills corners with ?"""
+
+            for r in range(len(self.board)):
+                # Fills outer columns with ?#?#?# pattern
+                if r % 2 == 0:
+                    self.board[r][0] = "?"
+                    self.board[r][len(self.board[0]) - 1] = "?"
+                else:
+                    self.board[r][0] = "#"
+                    self.board[r][len(self.board[0]) - 1] = "#"
+
+            for c in range(len(self.board[0])):
+                # Fills outers rows with ?#?#?# pattern
+                if c % 2 == 0:
+                    self.board[0][c] = "?"
+                    self.board[len(self.board) - 1][c] = "?"
+                else:
+                    self.board[0][c] = "#"
+                    self.board[len(self.board) - 1][c] = "#"
+
+            for r in range(len(self.board)):
+                for c in range(len(self.board[0])):
+                    if r % 2 == 0 and c % 2 == 0:
+                        self.board[r][c] = "?"
 
         def validate(self):
             """
@@ -250,32 +276,6 @@ class Board:
             print(self.board[r])
             output.append(self.board[r])
         return output
-
-    # def fill_borders(self):
-    #     """ Fills outer walls with #?#?#? pattern and fills corners with ?"""
-    #
-    #     for r in range(len(self.board)):
-    #         # Fills outer columns with ?#?#?# pattern
-    #         if r % 2 == 0:
-    #             self.board[r][0] = "?"
-    #             self.board[r][len(self.board[0]) - 1] = "?"
-    #         else:
-    #             self.board[r][0] = "#"
-    #             self.board[r][len(self.board[0]) - 1] = "#"
-    #
-    #     for c in range(len(self.board[0])):
-    #         # Fills outers rows with ?#?#?# pattern
-    #         if c % 2 == 0:
-    #             self.board[0][c] = "?"
-    #             self.board[len(self.board) - 1][c] = "?"
-    #         else:
-    #             self.board[0][c] = "#"
-    #             self.board[len(self.board) - 1][c] = "#"
-    #
-    #     for r in range(len(self.board)):
-    #         for c in range(len(self.board[0])):
-    #             if r % 2 == 0 and c % 2 == 0:
-    #                 self.board[r][c] = "?"
 
 
 class InvalidBoardException(Exception):

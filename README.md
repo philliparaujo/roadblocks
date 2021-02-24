@@ -17,7 +17,7 @@ corresponding classes with `-test` suffix. For example `pf-test.py` are the test
 for the code in the `pf.py` file.
 
 > Note: If the class is too involved, there may be other files named
-> `<file>-test-<something>`, to better organnize the tests.
+> `<file>-test-<something>`, to better organize the tests.
 
 To run from the command line, replacing `file-to-test.py` with the file to run the
 tests:
