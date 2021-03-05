@@ -18,6 +18,5 @@ b = board.Board.Builder([["?", "#", "?", "#", "?", "#", "?", "#", "?", "#", "?",
                          ["?", "#", "?", "#", "?", "#", "?", "#", "?", "#", "?", "#", "?", "#", "?"]]).build()
 
 #b = board.Board.Builder.empty()
-
 x = pf.PathFinder(b, {'x': 7, 'y': 1}, {'x': 7, 'y': 13})
 print(x.get_path())

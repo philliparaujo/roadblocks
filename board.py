@@ -42,7 +42,7 @@ class Board:
             cols = int(cols / 2)
 
             # Makes array
-            if rows > self.min_array_size and cols > self.min_array_size:
+            if rows >= self.min_array_size and cols >= self.min_array_size:
                 file_array = self.build_empty_board(rows, cols)
             else:
                 board_file.close()
@@ -170,7 +170,7 @@ class Board:
                     row.append(" ")
                 new_board.append(row)
 
-            return Board.Builder(new_board)
+            return new_board
 
         def fill_borders(self):
             """ Fills outer walls with #?#?#? pattern and fills corners with ?"""
@@ -260,6 +260,12 @@ class Board:
 
     def get(self, x, y):
         return self.board[y][x]
+
+    def get_start_pos(self):
+        for r in range(len(self.board)):
+            for c in range(len(self.board[0])):
+                if self.board[r][c] == "A":
+                    return {'x': c, 'y': r}
 
     def width(self):
         return len(self.board[0])

@@ -51,7 +51,9 @@ class PathFinder:
             avg_x = int((tempx + end_coord['x']) / 2)
             avg_y = int((tempy + end_coord['y']) / 2)
 
-            if self.board.get(avg_x, avg_y) == "#":
+            if self.board.get(avg_x, avg_y) == "#" or \
+                    self.board.get(avg_x, avg_y) == "|" or \
+                    self.board.get(avg_x, avg_y) == "-":
                 raise CantMoveHitWall()
 
         if end_coord['x'] < 1 or end_coord['y'] < 1 \
@@ -81,7 +83,7 @@ class PathFinder:
                 new_path = current_path + d
 
                 if new_path in visited:
-                    """If we repeated a path it means we __for sure__ do not have path."""
+                    """If we repeated a path, it means there is __for sure__ no valid path."""
                     raise NotFoundException()
                 else:
                     visited.append(new_path)
