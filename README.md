@@ -9,6 +9,10 @@ before your opponent.
    * `Board.Builder`: A Builder pattern that constructs boards.
 * `PathFinder`: A class that finds the shortest path between two points,
    if any, respecting all walls.
+* `SquareBoard`: A class that visually draws the game board with Square
+   objects
+   * `Square`: A class that represents one tile or wall of the visual game 
+   board 
 
 ## Running Tests
 

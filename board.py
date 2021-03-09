@@ -3,17 +3,23 @@ magic_create_key = "TheQuickBrownFox"
 
 class Board:
     class Builder:
-        def __init__(self, board):
+        def __init__(self, board, player):
             if len(board) == 0:
                 raise InvalidBoardException("Board is empty")
             self.board = board
+            self.player = player
             self.min_array_size = 5  # Min board size is 3
-            self.start_char = "A"
-            self.end_char = "B"
+
+            if self.player == 1:
+                self.start_char = "A"
+                self.end_char = "B"
+            else:
+                self.start_char = "a"
+                self.end_char = "b"
 
         @staticmethod
-        def empty():
-            return Board.Builder([[]])
+        def empty(player):
+            return Board.Builder([[]], player)
 
         def load_from_file(self, file_name):
             """
@@ -133,7 +139,7 @@ class Board:
             new_file.close()
 
         def clear(self):
-            self.board = Board.Builder.empty().board
+            self.board = Board.Builder.empty(self.player).board
             return self
 
         def append_row(self, cols):
@@ -239,9 +245,9 @@ class Board:
             :return: A new Board object using the map created by the Builder
             """
             self.validate()
-            return Board(magic_create_key, self.board)
+            return Board(magic_create_key, self.board, self.player)
 
-    def __init__(self, magic, board):
+    def __init__(self, magic, board, player):
         """
         :param magic: A key that prevents a Board object to be created without the Builder
         :param board: The 2D board array to be built and edited
@@ -249,6 +255,14 @@ class Board:
         if magic != magic_create_key:
             raise Exception("Can't create directly")
         self.board = board
+        self.player = player
+
+        if self.player == 1:
+            self.start_char = "A"
+            self.end_char = "B"
+        else:
+            self.start_char = "a"
+            self.end_char = "b"
 
     def set(self, x, y, what):
         """
@@ -264,7 +278,13 @@ class Board:
     def get_start_pos(self):
         for r in range(len(self.board)):
             for c in range(len(self.board[0])):
-                if self.board[r][c] == "A":
+                if self.board[r][c] == self.start_char:
+                    return {'x': c, 'y': r}
+
+    def get_end_pos(self):
+        for r in range(len(self.board)):
+            for c in range(len(self.board[0])):
+                if self.board[r][c] == self.end_char:
                     return {'x': c, 'y': r}
 
     def width(self):
