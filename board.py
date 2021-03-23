@@ -303,6 +303,33 @@ class Board:
             output.append(self.board[r])
         return output
 
+    def get_num_walls(self, i=None):
+        if i is None:
+            i = self.board
+
+        if self.player == 1:
+            wall = "-"
+        else:
+            wall = "|"
+
+        count = 0
+        for r in range(len(i)):
+            for c in range(len(i[0])):
+                if i[r][c] == wall:
+                    count += 1
+        return count
+
+    def get_changes(self, old_board):
+        old_walls = self.get_num_walls(old_board)
+        new_walls = self.get_num_walls()
+        num_changes = (new_walls-old_walls)
+
+        for r in range(len(self.board)):
+            for c in range(len(self.board[0])):
+                if self.board[r][c] != old_board[r][c]:
+                    num_changes += 1
+        return int(num_changes/2)
+
 
 class InvalidBoardException(Exception):
     def __init__(self, why):

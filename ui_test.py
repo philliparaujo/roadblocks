@@ -29,7 +29,7 @@ class UITester(unittest.TestCase):
                     ui_board.edit_fills(pos)
                 elif event.type == pygame.VIDEORESIZE:
                     ui_board.resize_squares()
-            ui_board.draw_squares(screen)
+            ui_board.draw(screen)
             pygame.display.update()
             pygame.time.wait(1000)
             running = False
@@ -58,7 +58,7 @@ class UITester(unittest.TestCase):
                     ui_board.edit_fills(pos)
                 elif event.type == pygame.VIDEORESIZE:
                     ui_board.resize_squares()
-            ui_board.draw_squares(screen)
+            ui_board.draw(screen)
             pygame.display.update()
             pygame.mouse.set_pos([660, 220])
             pygame.time.wait(100)
@@ -89,7 +89,7 @@ class UITester(unittest.TestCase):
                     ui_board.edit_fills(pos)
                 elif event.type == pygame.VIDEORESIZE:
                     ui_board.resize_squares()
-            ui_board.draw_squares(screen)
+            ui_board.draw(screen)
             pygame.display.update()
             pygame.mouse.set_pos([735, 235])
             pygame.time.wait(100)
@@ -120,7 +120,7 @@ class UITester(unittest.TestCase):
                     ui_board.edit_fills(pos)
                 elif event.type == pygame.VIDEORESIZE:
                     ui_board.resize_squares()
-            ui_board.draw_squares(screen)
+            ui_board.draw(screen)
             pygame.display.update()
             pygame.mouse.set_pos([670, 310])
             pygame.time.wait(100)
@@ -151,7 +151,7 @@ class UITester(unittest.TestCase):
                     ui_board.edit_fills(pos)
                 elif event.type == pygame.VIDEORESIZE:
                     ui_board.resize_squares()
-            ui_board.draw_squares(screen)
+            ui_board.draw(screen)
             pygame.display.update()
             pygame.mouse.set_pos([590, 240])
             pygame.time.wait(100)
@@ -184,7 +184,7 @@ class UITester(unittest.TestCase):
                     ui_board.edit_fills(pos)
                 elif event.type == pygame.VIDEORESIZE:
                     ui_board.resize_squares()
-            ui_board.draw_squares(screen)
+            ui_board.draw(screen)
             pygame.display.update()
             pygame.mouse.set_pos([735, 235])
             pygame.time.wait(100)
@@ -214,10 +214,10 @@ class UITester(unittest.TestCase):
                     ui_board.edit_fills(pos)
                 elif event.type == pygame.VIDEORESIZE:
                     ui_board.resize_squares()
-                    ui_board.draw_squares(screen)
+                    ui_board.draw(screen)
                     self.assertEqual(screen.get_at((410, 360)), ui_board.colors['wall'])
                     running = False
-            ui_board.draw_squares(screen)
+            ui_board.draw(screen)
             pygame.display.update()
 
             pygame.time.wait(100)
@@ -246,10 +246,10 @@ class UITester(unittest.TestCase):
                     ui_board.edit_fills(pos)
                 elif event.type == pygame.VIDEORESIZE:
                     ui_board.resize_squares()
-                    ui_board.draw_squares(screen)
+                    ui_board.draw(screen)
                     self.assertEqual(screen.get_at((410, 220)), ui_board.colors['wall'])
                     running = False
-            ui_board.draw_squares(screen)
+            ui_board.draw(screen)
             pygame.display.update()
 
             pygame.time.wait(100)
@@ -286,7 +286,7 @@ class UITester(unittest.TestCase):
                 elif event.type == pygame.VIDEORESIZE:
                     ui_board.resize_squares()
 
-            ui_board.draw_squares(screen)
+            ui_board.draw(screen)
             pygame.display.update()
             pygame.mouse.set_pos([240, 190])
             pygame.time.wait(100)

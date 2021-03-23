@@ -1,44 +1,47 @@
 import board
 import pygame
 import ui
+import ui_error
 import pf
+import engine
+import dice
+import button
 from pygame.locals import RESIZABLE
-
-pygame.init()
 
 # Editable window / board properties
 border_size = 15
 ratio = 4
 
-screen = pygame.display.set_mode((1200, 600), RESIZABLE)
-pygame.display.set_caption("Roadblocks1")
-screen.fill((0, 0, 0))
+screen = pygame.display.set_mode((1200, 800), RESIZABLE)
+pygame.display.set_caption("Roadblocks")
 
-# columns = 15
-# rows = 15
-# b = board.Board.Builder.build_empty_board(columns, rows)
-# b.fill_borders()
+engine = engine.Engine(screen)
 
 # Initialize first SquareBoard
 b = board.Board.Builder.empty(1)
 b.load_from_file("maps\\7x7 maze.txt")
 bb = b.build()
 ui_board = ui.SquareBoard(b.width(), b.height(), border_size, ratio, bb, True, 1)
-ui_board.create_squares()
-x = pf.PathFinder(ui_board.Board, {'x': 7, 'y': 1}, {'x': 7, 'y': 13})
+engine.create_game(ui_board)
 
 # Initialize second SquareBoard
 b2 = board.Board.Builder.empty(2)
 b2.load_from_file("maps\\7x7 maze.txt")
 bb2 = b2.build()
 ui_board2 = ui.SquareBoard(b2.width(), b2.height(), border_size, ratio, bb2, False, 2)
-ui_board2.create_squares()
-y = pf.PathFinder(ui_board2.Board, {'x': 1, 'y': 7}, {'x': 13, 'y': 7})
+engine.join_game(ui_board2)
 
+# Set wall pieces outside of board
+engine.create_wall_pieces()
 
-# Set visual fills for other player's start and end
-ui_board.set_opponent_tiles(ui_board2)
-ui_board2.set_opponent_tiles(ui_board)
+# Add dice
+dice = dice.Dice(ui_board.board[0][0].x, ui_board.board[0][0].y - 1.3*ui_board.board[1][1].width - border_size, 1.3*ui_board.board[1][1].width, [1,2,3,4,5,6])
+dice.roll()
+dice.create_dots(dice.last_roll)
+engine.set_dice(dice)
+
+bt = button.Button(dice, ui_board2, 1, [255, 255, 255])
+bt2 = button.Button(dice, ui_board2, 2, [255, 255, 255])
 
 running = True
 while running:
@@ -48,40 +51,45 @@ while running:
 
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE:
-                if ui_board.turn:
-                    ui_board.end_turn()
-                    ui_board2.start_turn()
-                    pygame.display.set_caption("Roadblocks2")
-                elif ui_board2.turn:
-                    ui_board2.end_turn()
-                    ui_board.start_turn()
-                    pygame.display.set_caption("Roadblocks1")
+                engine.switch_turns()
+                engine.set_old_board()
+
+            if event.key == pygame.K_w:
+                engine.end_wall_time()  # Only happens if placed correct # of walls
+
+            if event.key == pygame.K_l:
+                engine.leave_game(ui_board2)
 
         elif event.type == pygame.MOUSEBUTTONDOWN:
             pos = pygame.mouse.get_pos()
 
-            # On click, toggle square color and update game board
-            if ui_board.turn:
-                ui_board.edit_fills(pos, ui_board2)
-                x = pf.PathFinder(ui_board.Board, ui_board.Board.get_start_pos(), x.end)
-                print(x.get_path())
-                ui_board.Board.print()
-            elif ui_board2.turn:
-                ui_board2.edit_fills(pos, ui_board)
-                y = pf.PathFinder(ui_board2.Board, ui_board2.Board.get_start_pos(), y.end)
-                print(y.get_path())
-                ui_board2.Board.print()
+            bt.click(pos, engine)
+            bt2.click(pos, engine)
 
-            #print(pos)
+            # On click, toggle square color and update game board
+            try:
+                engine.play(pos)
+                engine.recreate_board()  # For when both players overlap
+            except pf.SamePointException as e:
+                engine.end_game()
+            except pf.NotFoundException as e:
+                print("ILLEGAL")
 
         elif event.type == pygame.VIDEORESIZE:
             # When screen is resized, resizes and redraws squares
-            ui_board.resize_squares(ui_board2)
-            ui_board2.resize_squares(ui_board)
+            engine.recreate_board()
+
+            temp = dice.last_roll
+            dice = dice.resize(ui_board.board[0][0].x, ui_board.board[0][0].y - 1.3*ui_board.board[1][1].width - border_size, 1.3*ui_board.board[1][1].width)
+            dice.last_roll = temp
+            dice.create_dots(dice.last_roll)
+
+            engine.set_dice(dice)
+            bt.resize(dice)
+            bt2.resize(dice)
 
     # While running, draw squares
-    ui_board.draw_squares(screen)
-    ui_board2.draw_squares(screen)
-    pygame.display.update()
+    screen.fill((0, 0, 0))
+    engine.draw(bt, bt2)
 
-#ui_board.Board.print()
+    pygame.display.update()
