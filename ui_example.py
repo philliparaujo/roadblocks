@@ -19,14 +19,14 @@ engine = engine.Engine(screen)
 
 # Initialize first SquareBoard
 b = board.Board.Builder.empty(1)
-b.load_from_file("maps\\7x7 maze.txt")
+b.load_from_file("maps\\7x7 defense.txt")
 bb = b.build()
 ui_board = ui.SquareBoard(b.width(), b.height(), border_size, ratio, bb, True, 1)
 engine.create_game(ui_board)
 
 # Initialize second SquareBoard
 b2 = board.Board.Builder.empty(2)
-b2.load_from_file("maps\\7x7 maze.txt")
+b2.load_from_file("maps\\7x7 defense.txt")
 bb2 = b2.build()
 ui_board2 = ui.SquareBoard(b2.width(), b2.height(), border_size, ratio, bb2, False, 2)
 engine.join_game(ui_board2)
@@ -42,6 +42,10 @@ engine.set_dice(dice)
 
 bt = button.Button(dice, ui_board2, 1, [255, 255, 255])
 bt2 = button.Button(dice, ui_board2, 2, [255, 255, 255])
+
+error = ui_error.UiError(0,0,0,0,"")
+pygame.init()
+font = pygame.font.Font(pygame.font.get_default_font(), 0)
 
 running = True
 while running:
@@ -59,6 +63,22 @@ while running:
 
             if event.key == pygame.K_l:
                 engine.leave_game(ui_board2)
+
+            if event.key == pygame.K_e:
+                error = ui_error.UiError(dice.x+2*dice.width, dice.y, dice.width*3, dice.height, "illegal move")
+
+            if event.key == pygame.K_f:
+                error = ui_error.UiError(dice.x+2*dice.width, dice.y, dice.width*3, dice.height, "out of moves")
+
+            if event.key == pygame.K_g:
+                error = ui_error.UiError(dice.x+2*dice.width, dice.y, dice.width*3, dice.height, "out of walls")
+
+        elif event.type == pygame.MOUSEMOTION:
+            pos = pygame.mouse.get_pos()
+            engine.edit_outlines(pos, dice)
+
+            bt.draw_outline_rect(pos)
+            bt2.draw_outline_rect(pos)
 
         elif event.type == pygame.MOUSEBUTTONDOWN:
             pos = pygame.mouse.get_pos()
@@ -82,14 +102,20 @@ while running:
             temp = dice.last_roll
             dice = dice.resize(ui_board.board[0][0].x, ui_board.board[0][0].y - 1.3*ui_board.board[1][1].width - border_size, 1.3*ui_board.board[1][1].width)
             dice.last_roll = temp
+            dice.moves_left = dice.last_roll
             dice.create_dots(dice.last_roll)
 
             engine.set_dice(dice)
             bt.resize(dice)
             bt2.resize(dice)
 
+            error.resize(5, 5)
+
     # While running, draw squares
     screen.fill((0, 0, 0))
     engine.draw(bt, bt2)
+    dice.animate_roll()
+
+    error.draw_square(screen)
 
     pygame.display.update()

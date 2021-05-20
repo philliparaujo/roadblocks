@@ -1,3 +1,5 @@
+import math
+
 import numpy
 import pygame
 
@@ -47,15 +49,20 @@ class Engine:
             self.dice.draw(self.screen)
 
             # Draws top right UI
-            self.display_text("Walls left: " + str(self.walls_left()[1]), int(self.dice.height / 2),
-                              self.screen.get_size()[0] - bt.x + self.p1.border_size, self.dice.y)
-            self.display_text("Moves left: " + str(self.moves_left()), int(self.dice.height / 2),
-                              self.screen.get_size()[0] - bt2.x + self.p1.border_size,
-                              self.dice.y + self.dice.height / 2)
+            self.display_text_right("Walls left: " + str(self.walls_left()[1]), int(self.dice.height / 2),
+                                    bt.left - 10, bt.centery)
+            self.display_text_right("Moves left: " + str(self.moves_left()), int(self.dice.height / 2),
+                                    bt2.left - 10, bt2.centery)
             bt.draw(self.screen, self)
             bt2.draw(self.screen, self)
-            self.display_text("lock walls", int(bt.height * 2 / 3), self.screen.get_size()[0] - bt.x - bt.width, bt.y)
-            self.display_text("end turn", int(bt2.height * 2 / 3), self.screen.get_size()[0] - bt2.x - bt2.width, bt2.y)
+            self.display_text_center("lock walls", int(bt.height * 2 / 3), bt.centerx, bt.centery)
+            self.display_text_center("end turn", int(bt2.height * 2 / 3), bt2.centerx, bt2.centery)
+
+    def edit_outlines(self, pos, dice):
+        if self.game_over is not True:
+            if not dice.is_rolling():
+                player, other = self.get_player_turn()
+                player.edit_outline(pos)
 
     def recreate_board(self):
         if self.game_over is not True:
@@ -78,22 +85,22 @@ class Engine:
 
     def play(self, pos):
         if self.game_over is not True:
-            player, other = self.get_player_turn()
-            player.edit_fills(pos, other)
-            player.update_pathfinder()
-            other.update_pathfinder()
-            if player.get_path() is None or other.get_path() is None:
-                print(player.get_path(), other.get_path())
+            if not self.dice.is_rolling():
+                player, other = self.get_player_turn()
+                player.edit_fills(pos, other)
+                player.update_pathfinder()
+                other.update_pathfinder()
+                if player.get_path() is None or other.get_path() is None:  # If illegal move, notify
+                    print(player.get_path(), other.get_path())
 
-            if player.wall_time:
-                player.change_wall_piece_fills(self.screen, 7 - player.Board.get_num_walls())
-            elif player.get_clicked_index(pos) is not None:
-                print(player.get_clicked_index(pos))
-                self.dice.moves_left -= 1
+                if player.wall_time:
+                    player.change_wall_piece_fills(self.screen, 7 - player.Board.get_num_walls())
+                elif player.get_click_adjacency(pos) == 0:
+                    self.dice.moves_left -= 1
 
-            # print(player.Board.get_num_walls())
-            # player.Board.print()
-            # print(player.get_clicked_index(pos))
+                # print(player.Board.get_num_walls())
+                # player.Board.print()
+                # print(player.get_mouse_index(pos))
 
     def walls_left(self):
         player, other = self.get_player_turn()
@@ -146,7 +153,7 @@ class Engine:
             player.toggle_mask_visible()
             other.toggle_mask_visible()
 
-            self.dice.animate_roll()
+            self.dice.trigger_roll()
 
     def get_player_turn(self):
         if not self.game_over:
@@ -157,15 +164,28 @@ class Engine:
             else:
                 return None
 
-    def display_text(self, message, size, x, y):
+    def display_text_center(self, message, size, x, y):
+        """x = centerX, y = centery"""
         player, other = self.get_player_turn()
 
         pygame.init()
         font = pygame.font.Font(pygame.font.get_default_font(), size)
         text = font.render(message, False, player.colors['player'])
         text_rect = text.get_rect()
-        text_rect.right = self.screen.get_size()[0] - x
-        text_rect.top = y
+        text_rect.centerx = x
+        text_rect.centery = y
+        self.screen.blit(text, text_rect)
+
+    def display_text_right(self, message, size, x, y):
+        """x = right, y = centery"""
+        player, other = self.get_player_turn()
+
+        pygame.init()
+        font = pygame.font.Font(pygame.font.get_default_font(), size)
+        text = font.render(message, False, player.colors['player'])
+        text_rect = text.get_rect()
+        text_rect.right = x
+        text_rect.centery = y
         self.screen.blit(text, text_rect)
 
     def check_win(self):

@@ -28,6 +28,10 @@ class Dice(Surface):
         self.color = (255, 255, 255)
         self.fill(self.color)
 
+        self.last = pygame.time.get_ticks()  # time since last cooldown
+        self.cooldown = 300  # time to give between animated rolls (ms)
+        self.count = 10  # amount of times triggered roll animation (10 is max, resets to 0 to trigger animation)
+
     def roll(self):
         self.last_roll = self.roll_options[random.randint(0, 5)]
         self.moves_left = self.last_roll
@@ -76,8 +80,21 @@ class Dice(Surface):
             self.dots.append(n)
 
     def animate_roll(self):
-        clock = pygame.time.Clock()
-        for i in range(10):
-            self.roll()
-            pygame.display.flip()
-            clock.tick(100)
+        if self.count < 10:
+            if self.get_cooldown() > self.cooldown:
+                self.roll()
+                self.count += 1
+                self.set_cooldown()
+
+    def is_rolling(self):
+        return self.count < 10
+
+    def trigger_roll(self):
+        self.count = 0
+
+    def get_cooldown(self):
+        now = pygame.time.get_ticks()
+        return now - self.last
+
+    def set_cooldown(self):
+        self.last = pygame.time.get_ticks()
